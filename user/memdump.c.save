@@ -57,7 +57,7 @@ main(int argc, char *argv[])
   exit(0);
 }
 
-  void
+void
 memdump(char *fmt, char *data)
 {
     for (char *f = fmt; *f; f++) {
@@ -106,5 +106,6 @@ memdump(char *fmt, char *data)
         }
     }
 }
+
 
 
