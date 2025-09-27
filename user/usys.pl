@@ -34,6 +34,7 @@ entry("open");
 entry("mknod");
 entry("unlink");
 entry("fstat");
+entry("uptime");
 entry("link");
 entry("mkdir");
 entry("chdir");
@@ -41,4 +42,5 @@ entry("dup");
 entry("getpid");
 entry("sbrk");
 entry("pause");
-entry("uptime");
+entry("sleep");
+

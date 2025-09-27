@@ -1,9 +1,12 @@
 #include "kernel/types.h"
-#include "kernel/stat.h"
-#include "kernel/fs.h"
-#include "kernel/param.h"
 #include "user/user.h"
 
-void
-find(char *path, char *target, char *exec_argv[MAXARG], int exec_count){
+int main(int argc, char *argv[]) {
+    if(argc < 2) {
+        printf("Usage: exec command [args...]\n");
+        exit(1);
+    }
+    
+    printf("exec would run: %s\n", argv[1]);
+    exit(0);
 }

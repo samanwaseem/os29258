@@ -193,8 +193,15 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_logstress\
+        $U/_sleep\
+        $U/_sixfive\
+        $U/_memdump\
+        $U/_find\
+        $U/_exec\
+        $U/_uptime\
 	$U/_forphan\
 	$U/_dorphan\
+
 
 
 

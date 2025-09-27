@@ -3,7 +3,9 @@
 struct stat;
 
 // system calls
+
 int fork(void);
+int uptime(void);
 int sleep(int);
 int exit(int) __attribute__((noreturn));
 int wait(int*);
