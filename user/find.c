@@ -3,7 +3,6 @@
 #include "user/user.h"
 #include "kernel/fs.h"
 
-// Fixed regex functions
 int matchhere(char *pattern, char *text);
 int matchstar(int c, char *pattern, char *text);
 
