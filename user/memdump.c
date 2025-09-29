@@ -65,8 +65,10 @@ memdump(char *fmt, char *data)
 
 
         case 'i': { //print the next 4 bytes of the data as a 32-bit integer, in decimal
+          //to treat bytes as int not data
             int val = *(int *)data;
             printf("%d\n", val);
+          //advance for next 4 bytes
             data += 4;
             break;
         }
@@ -96,7 +98,6 @@ memdump(char *fmt, char *data)
         }
         case 'S': { // the rest of the data contains the bytes of a null-terminated C string; print the string
             printf("%s\n", data);
-            // consume the whole string
             data += strlen(data) + 1;
             break;
         }

@@ -1,8 +1,13 @@
 // Shell.
+//modify the shell to not print a $ when processing shell commands from a file (moderate)
+//modify the shell to support wait (easy)
+//modify the shell to support tab completion (easy)
+//modify the shell to keep a history of passed shell commands (moderate)
 
 #include "kernel/types.h"
 #include "user/user.h"
 #include "kernel/fcntl.h"
+#include "kernel/stat.h"
 
 // Parsed command representation
 #define EXEC  1
@@ -132,15 +137,18 @@ runcmd(struct cmd *cmd)
 }
 
 int
-getcmd(char *buf, int nbuf)
+getcmd(char *buf, int nbuf, int interactive)  // Add interactive parameter
 {
-  write(2, "$ ", 2);
-  memset(buf, 0, nbuf);
-  gets(buf, nbuf);
-  if(buf[0] == 0) // EOF
-    return -1;
-  return 0;
+    if(interactive) {
+        fprintf(2, "$ ");    // Only show prompt if interactive
+    }
+    memset(buf, 0, nbuf);
+    gets(buf, nbuf);
+    if(buf[0] == 0) // EOF
+        return -1;
+    return 0;
 }
+
 
 int
 main(void)
@@ -148,6 +156,11 @@ main(void)
   static char buf[100];
   int fd;
 
+struct stat st;
+int interactive = 0;
+if(fstat(0, &st) >= 0 && st.type == T_DEVICE){
+interactive = 1;
+}
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
     if(fd >= 3){
@@ -156,8 +169,14 @@ main(void)
     }
   }
 
+
+
   // Read and run input commands.
-  while(getcmd(buf, sizeof(buf)) >= 0){
+  while(getcmd(buf, sizeof(buf), interactive) >= 0){
+    if(interactive) {
+           fprintf(2, "$ ");
+     }
+
     char *cmd = buf;
     while (*cmd == ' ' || *cmd == '\t')
       cmd++;
