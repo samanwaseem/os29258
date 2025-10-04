@@ -7,6 +7,30 @@
 #include "syscall.h"
 #include "defs.h"
 
+// Prototypes for the functions that handle system calls.
+extern uint64 sys_fork(void);
+extern uint64 sys_trace(void);
+extern uint64 sys_exit(void);
+extern uint64 sys_wait(void);
+extern uint64 sys_pipe(void);
+extern uint64 sys_read(void);
+extern uint64 sys_kill(void);
+extern uint64 sys_exec(void);
+extern uint64 sys_fstat(void);
+extern uint64 sys_chdir(void);
+extern uint64 sys_dup(void);
+extern uint64 sys_getpid(void);
+extern uint64 sys_sbrk(void);
+extern uint64 sys_pause(void);
+extern uint64 sys_uptime(void);
+extern uint64 sys_open(void);
+extern uint64 sys_write(void);
+extern uint64 sys_mknod(void);
+extern uint64 sys_unlink(void);
+extern uint64 sys_link(void);
+extern uint64 sys_mkdir(void);
+extern uint64 sys_close(void);
+
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -79,29 +103,6 @@ argstr(int n, char *buf, int max)
   return fetchstr(addr, buf, max);
 }
 
-// Prototypes for the functions that handle system calls.
-extern uint64 sys_fork(void);
-extern uint64 sys_exit(void);
-extern uint64 sys_wait(void);
-extern uint64 sys_pipe(void);
-extern uint64 sys_read(void);
-extern uint64 sys_kill(void);
-extern uint64 sys_exec(void);
-extern uint64 sys_fstat(void);
-extern uint64 sys_chdir(void);
-extern uint64 sys_dup(void);
-extern uint64 sys_getpid(void);
-extern uint64 sys_sbrk(void);
-extern uint64 sys_pause(void);
-extern uint64 sys_uptime(void);
-extern uint64 sys_open(void);
-extern uint64 sys_write(void);
-extern uint64 sys_mknod(void);
-extern uint64 sys_unlink(void);
-extern uint64 sys_link(void);
-extern uint64 sys_mkdir(void);
-extern uint64 sys_close(void);
-
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
 static uint64 (*syscalls[])(void) = {
@@ -120,12 +121,38 @@ static uint64 (*syscalls[])(void) = {
 [SYS_pause]   sys_pause,
 [SYS_uptime]  sys_uptime,
 [SYS_open]    sys_open,
+[SYS_trace]   sys_trace,
 [SYS_write]   sys_write,
 [SYS_mknod]   sys_mknod,
 [SYS_unlink]  sys_unlink,
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+};
+
+const char* syscall_names[] = {
+  [SYS_fork]    "fork",
+  [SYS_exit]    "exit",
+  [SYS_wait]    "wait",
+  [SYS_pipe]    "pipe",
+  [SYS_read]    "read",
+  [SYS_kill]    "kill",
+  [SYS_exec]    "exec",
+  [SYS_fstat]   "fstat",
+  [SYS_chdir]   "chdir",
+  [SYS_dup]     "dup",
+  [SYS_getpid]  "getpid",
+  [SYS_sbrk]    "sbrk",
+  [SYS_pause]   "pause",
+  [SYS_uptime]  "uptime",
+  [SYS_open]    "open",
+  [SYS_write]   "write",
+  [SYS_mknod]   "mknod",
+  [SYS_unlink]  "unlink",
+  [SYS_link]    "link",
+  [SYS_mkdir]   "mkdir",
+  [SYS_close]   "close",
+  [SYS_trace]   "trace",
 };
 
 void
@@ -136,9 +163,19 @@ syscall(void)
 
   num = p->trapframe->a7;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Use num to lookup the system call function for num, call it,
-    // and store its return value in p->trapframe->a0
-    p->trapframe->a0 = syscalls[num]();
+    // Sandbox enforcement: check if syscall is being traced
+    if(p->trace_mask & (1 << num)) {
+      // This syscall is being traced - print information
+      printf("%d: syscall %s -> ", p->pid, syscall_names[num]);
+      
+      // Execute the system call
+      p->trapframe->a0 = syscalls[num]();
+      
+      printf("%d\n",(int)p->trapframe->a0);
+    } else {
+      // Normal syscall execution
+      p->trapframe->a0 = syscalls[num]();
+    }
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);

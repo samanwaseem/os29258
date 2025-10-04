@@ -6,22 +6,80 @@
 #include "proc.h"
 #include "syscall.h"
 #include "defs.h"
+Build again
+After making these changes:
 
+bash
+make clean
+make
+The key issues were:
+
+Missing uint64 return type for sys_trace
+
+Potential issue with argint function - make sure it returns an int
+
+If you're still having issues, please share your current kernel/sysproc.c file and I can help you fix the specific problems.
+
+uint64
+
+sys_trace(void){
+int mask;
+if(argint(0, &mask) < 0)
+return -1;
+myproc()->trace_mask = mask;
+return 0;
+}
+The issue is that you're missing the function name on the first line! You have:
+
+c
+uint64
+
+sys_trace(void){
+But it should be:
+
+c
+uint64
+sys_trace(void)
+{
+Fix it like this:
+c
 uint64
 sys_trace(void)
 {
   int mask;
-  argint(0, &mask);
+  if(argint(0, &mask) < 0)
+    return -1;
   myproc()->trace_mask = mask;
   return 0;
 }
+Or if you prefer it on one line:
+c
+uint64 sys_trace(void)
+{
+  int mask;
+  if(argint(0, &mask) < 0)
+    return -1;
+  myproc()->trace_mask = mask;
+  return 0;
+}
+The problem is that you have uint64 on o
 
 uint64
+sys_trace(void)
+{
+int mask;
+if(argint(0, &mask) < 0)
+return -1;
+myproc()->trace_mask = mask;
+return 0;
+}
+
+
 sys_exit(void)
 {
   int n;
   argint(0, &n);
-  exit(n);
+  kexit(n);
   return 0;  // not reached
 }
 
@@ -34,7 +92,7 @@ sys_getpid(void)
 uint64
 sys_fork(void)
 {
-  return fork();
+  return kfork();
 }
 
 uint64
@@ -42,7 +100,7 @@ sys_wait(void)
 {
   uint64 p;
   argaddr(0, &p);
-  return wait(p);
+  return kwait(p);
 }
 
 uint64
@@ -72,7 +130,7 @@ sys_sbrk(void)
 }
 
 uint64
-sys_sleep(void)
+sys_pause(void)
 {
   int n;
   uint ticks0;
@@ -99,7 +157,7 @@ sys_kill(void)
   int pid;
 
   argint(0, &pid);
-  return kill(pid);
+  return kkill(pid);
 }
 
 // return how many clock tick interrupts have occurred
