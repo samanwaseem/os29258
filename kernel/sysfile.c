@@ -25,8 +25,9 @@ argfd(int n, int *pfd, struct file **pf)
   struct file *f;
 
   argint(n, &fd);
-  if(fd < 0 || fd >= NOFILE || (f=myproc()->ofile[fd]) == 0)
+  if(fd < 0 || fd >= NOFILE || (f=myproc()->ofile[fd]) == 0){
     return -1;
+   }
   if(pfd)
     *pfd = fd;
   if(pf)
@@ -57,10 +58,12 @@ sys_dup(void)
   struct file *f;
   int fd;
 
-  if(argfd(0, 0, &f) < 0)
+  if(argfd(0, 0, &f) < 0){
     return -1;
-  if((fd=fdalloc(f)) < 0)
+  }
+  if((fd=fdalloc(f)) < 0){
     return -1;
+   }
   filedup(f);
   return fd;
 }
@@ -74,8 +77,9 @@ sys_read(void)
 
   argaddr(1, &p);
   argint(2, &n);
-  if(argfd(0, 0, &f) < 0)
+  if(argfd(0, 0, &f) < 0){
     return -1;
+  }
   return fileread(f, p, n);
 }
 
@@ -88,8 +92,9 @@ sys_write(void)
   
   argaddr(1, &p);
   argint(2, &n);
-  if(argfd(0, 0, &f) < 0)
+  if(argfd(0, 0, &f) < 0){
     return -1;
+   }
 
   return filewrite(f, p, n);
 }
@@ -100,8 +105,9 @@ sys_close(void)
   int fd;
   struct file *f;
 
-  if(argfd(0, &fd, &f) < 0)
+  if(argfd(0, &fd, &f) < 0){
     return -1;
+  }
   myproc()->ofile[fd] = 0;
   fileclose(f);
   return 0;
@@ -114,8 +120,9 @@ sys_fstat(void)
   uint64 st; // user pointer to struct stat
 
   argaddr(1, &st);
-  if(argfd(0, 0, &f) < 0)
+  if(argfd(0, 0, &f) < 0){
     return -1;
+   }
   return filestat(f, st);
 }
 
@@ -126,8 +133,18 @@ sys_link(void)
   char name[DIRSIZ], new[MAXPATH], old[MAXPATH];
   struct inode *dp, *ip;
 
-  if(argstr(0, old, MAXPATH) < 0 || argstr(1, new, MAXPATH) < 0)
+  if(argstr(0, old, MAXPATH) < 0 || argstr(1, new, MAXPATH) < 0){
     return -1;
+   }
+
+ 
+   struct proc *p = myproc();
+  if(p->sandbox_path) {
+    if(strncmp(old, p->sandbox_prefix, strlen(p->sandbox_prefix)) != 0 ||
+       strncmp(new, p->sandbox_prefix, strlen(p->sandbox_prefix)) != 0) {
+      return -1;  // Path outside sandbox
+    }
+  }
 
   begin_op();
   if((ip = namei(old)) == 0){
@@ -193,8 +210,16 @@ sys_unlink(void)
   char name[DIRSIZ], path[MAXPATH];
   uint off;
 
-  if(argstr(0, path, MAXPATH) < 0)
+  if(argstr(0, path, MAXPATH) < 0){
     return -1;
+    }
+
+    struct proc *p = myproc();
+  if(p->sandbox_path) {
+    if(strncmp(path, p->sandbox_prefix, strlen(p->sandbox_prefix)) != 0) {
+      return -1;  // Path outside sandbox
+    }
+  }
 
   begin_op();
   if((dp = nameiparent(path, name)) == 0){
@@ -314,6 +339,13 @@ sys_open(void)
   if((n = argstr(0, path, MAXPATH)) < 0)
     return -1;
 
+  struct proc *p = myproc();
+  if(p->sandbox_path) {
+    if(strncmp(path, p->sandbox_prefix, strlen(p->sandbox_prefix)) != 0) {
+      return -1;  // Path outside sandbox
+    }
+   }
+
   begin_op();
 
   if(omode & O_CREATE){
@@ -381,6 +413,14 @@ sys_mkdir(void)
     end_op();
     return -1;
   }
+
+   struct proc *p = myproc();
+  if(p->sandbox_path) {
+    if(strncmp(path, p->sandbox_prefix, strlen(p->sandbox_prefix)) != 0) {
+      return -1;  // Path outside sandbox
+    }
+  }
+
   iunlockput(ip);
   end_op();
   return 0;

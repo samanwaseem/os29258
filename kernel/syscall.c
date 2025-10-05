@@ -7,9 +7,13 @@
 #include "syscall.h"
 #include "defs.h"
 
+
 // Prototypes for the functions that handle system calls.
+extern uint64 sys_sandbox(void);
 extern uint64 sys_fork(void);
 extern uint64 sys_trace(void);
+extern uint64 sys_sandbox_cmd(void);
+extern uint64 sys_sandbox_path(void);
 extern uint64 sys_exit(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_pipe(void);
@@ -122,6 +126,9 @@ static uint64 (*syscalls[])(void) = {
 [SYS_uptime]  sys_uptime,
 [SYS_open]    sys_open,
 [SYS_trace]   sys_trace,
+[SYS_trace]   sys_sandbox,
+[SYS_sandbox_cmd] sys_sandbox_cmd,
+[SYS_sandbox_path] sys_sandbox_path,
 [SYS_write]   sys_write,
 [SYS_mknod]   sys_mknod,
 [SYS_unlink]  sys_unlink,
@@ -153,6 +160,9 @@ const char* syscall_names[] = {
   [SYS_mkdir]   "mkdir",
   [SYS_close]   "close",
   [SYS_trace]   "trace",
+  [SYS_sandbox] "sandbox",
+  [SYS_sandbox_cmd]  "sandbox_cmd",
+  [SYS_sandbox_path] "sandbox_path",
 };
 
 void
@@ -163,22 +173,23 @@ syscall(void)
 
   num = p->trapframe->a7;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Sandbox enforcement: check if syscall is being traced
-    if(p->trace_mask & (1 << num)) {
-      // This syscall is being traced - print information
+    // SANDBOX: Block if in sandbox mask
+    if(p->sandbox_mask & (1 << num)) {
+      p->trapframe->a0 = -1;  // Block the system call
+    }
+    // TRACE: Print if in trace mask (but still execute)
+    else if(p->trace_mask & (1 << num)) {
       printf("%d: syscall %s -> ", p->pid, syscall_names[num]);
-      
-      // Execute the system call
       p->trapframe->a0 = syscalls[num]();
-      
-      printf("%d\n",(int)p->trapframe->a0);
-    } else {
-      // Normal syscall execution
+      printf("%d\n", (int)p->trapframe->a0);
+    }
+    // Normal execution
+    else {
       p->trapframe->a0 = syscalls[num]();
     }
   } else {
-    printf("%d %s: unknown sys call %d\n",
-            p->pid, p->name, num);
+    printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
 }
+	

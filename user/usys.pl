@@ -23,6 +23,10 @@ sub entry {
 	
 entry("fork");
 entry("exit");
+entry("trace");
+entry("sandbox");
+entry("sandbox_cmd");
+entry("sandbox_path");
 entry("wait");
 entry("pipe");
 entry("read");

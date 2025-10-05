@@ -1,0 +1,13 @@
+
+
+cat > answers-syscall.txt << 'EOF'
+1. The main goal of this lab is to understand how system calls work in xv6 by implementing new system calls (trace and sandbox) and modifying the system call handler.
+
+2. The trace system call works by setting a bitmask in the process structure. When a system call is made, if the corresponding bit is set in the trace mask, information about that system call is printed.
+
+3. The sandbox system calls work by restricting which programs can be executed (command sandbox) or which file paths can be accessed (path sandbox). The restrictions are enforced in the exec system call and file system calls respectively.
+
+4. The most challenging part was modifying the system call handler to properly intercept and restrict system calls while maintaining compatibility with existing functionality.
+EOF
+
+Your answers to the syscall lab questions

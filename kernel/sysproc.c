@@ -17,12 +17,21 @@ sys_trace(void)
 }
 
 uint64
+sys_sandbox(void)
+{
+  int mask;
+  argint(0, &mask);
+  myproc()->sandbox_mask = mask;
+  return 0;
+}
+
+uint64
 sys_exit(void)
 {
   int n;
   argint(0, &n);
-  exit(n);
-  return 0;  // not reached
+  kexit(n);
+  return 0;
 }
 
 uint64
@@ -34,7 +43,7 @@ sys_getpid(void)
 uint64
 sys_fork(void)
 {
-  return fork();
+  return kfork();
 }
 
 uint64
@@ -42,37 +51,24 @@ sys_wait(void)
 {
   uint64 p;
   argaddr(0, &p);
-  return wait(p);
+  return kwait(p);
 }
 
 uint64
 sys_sbrk(void)
 {
-  uint64 addr;
-  int t;
   int n;
+  uint64 addr;
 
   argint(0, &n);
-  argint(1, &t);
   addr = myproc()->sz;
-
-  if(t == SBRK_EAGER || n < 0) {
-    if(growproc(n) < 0) {
-      return -1;
-    }
-  } else {
-    // Lazily allocate memory for this process: increase its memory
-    // size but don't allocate memory. If the processes uses the
-    // memory, vmfault() will allocate it.
-    if(addr + n < addr)
-      return -1;
-    myproc()->sz += n;
-  }
+  if(growproc(n) < 0)
+    return -1;
   return addr;
 }
 
 uint64
-sys_sleep(void)
+sys_pause(void)
 {
   int n;
   uint ticks0;
@@ -97,20 +93,47 @@ uint64
 sys_kill(void)
 {
   int pid;
-
   argint(0, &pid);
-  return kill(pid);
+  return kkill(pid);
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
 uint64
 sys_uptime(void)
 {
   uint xticks;
-
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64
+sys_sandbox_cmd(void)
+{
+  char allowed[16];
+  
+  // Get the allowed command name argument
+  if(argstr(0, allowed, sizeof(allowed)) < 0) {
+    return -1;
+  }
+  
+  struct proc *p = myproc();
+  p->sandbox_cmd = 1;
+  safestrcpy(p->sandbox_allowed, allowed, sizeof(p->sandbox_allowed));
+  return 0;
+}
+
+uint64
+sys_sandbox_path(void)
+{
+  char prefix[128];
+  
+  if(argstr(0, prefix, sizeof(prefix)) < 0) {
+    return -1;
+  }
+  
+  struct proc *p = myproc();
+  p->sandbox_path = 1;
+  safestrcpy(p->sandbox_prefix, prefix, sizeof(p->sandbox_prefix));
+  return 0;
 }

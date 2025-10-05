@@ -35,6 +35,21 @@ kexec(char *path, char **argv)
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
 
+  // Sandbox enforcement - check if process is sandboxed
+ if(p->sandbox_cmd) {
+  // Extract the command name from the path
+  char *c;
+  for(c = path + strlen(path); c >= path && *c != '/'; c--)
+    ;
+  c++;
+  
+  // Check if the command matches the allowed command
+  // Use strncmp (which exists in xv6) instead of strcmp
+  if(strncmp(c, p->sandbox_allowed, strlen(p->sandbox_allowed)) != 0) {
+    return -1;  // Command not allowed
+  }
+}
+
   begin_op();
 
   // Open the executable file.
@@ -144,6 +159,7 @@ kexec(char *path, char **argv)
     iunlockput(ip);
     end_op();
   }
+
   return -1;
 }
 

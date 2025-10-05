@@ -147,6 +147,11 @@ found:
   p->context.sp = p->kstack + PGSIZE;
 
   p->trace_mask = 0;
+  p->sandbox_mask = 0;
+  p->sandbox_cmd = 0;
+  p->sandbox_allowed[0] = 0;
+  p->sandbox_path = 0;
+  p->sandbox_prefix[0] = 0;
 
   return p;
 }
@@ -280,6 +285,9 @@ kfork(void)
 
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
+
+  np->trace_mask = p->trace_mask;
+  np->sandbox_mask = p->sandbox_mask;
 
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)

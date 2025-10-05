@@ -92,7 +92,11 @@ struct proc {
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
   int trace_mask;
-
+  int sandbox_mask;
+  int sandbox_cmd;
+  char sandbox_allowed[16];
+  int sandbox_path;         
+  char sandbox_prefix[128];
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
 
