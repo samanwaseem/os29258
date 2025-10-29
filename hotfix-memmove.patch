@@ -1,0 +1,77 @@
+*** Begin Patch
+*** Update File: kernel/string.c
+@@
+ void*
+ memmove(void *dst, const void *src, uint n)
+ {
+-  const char *s;
+-  char *d;
+-
+-  if(n == 0)
+-    return dst;
+-
+-  s = src;
+-  d = dst;
+-  if(s < d && s + n > d){
+-    s += n;
+-    d += n;
+-    while(n-- > 0)
+-      *--d = *--s;
+-  } else
+-    while(n-- > 0)
+-      *d++ = *s++;
+-
+-  return dst;
++ 
++  if ((uint64)dst >= MAXVA && (uint64)src >= MAXVA) {
++    const char *s = src;
++    char *d = dst;
++    if(n == 0)
++      return dst;
++    if(s < d && s + n > d){
++      s += n;
++      d += n;
++      while(n-- > 0)
++        *--d = *--s;
++    } else
++      while(n-- > 0)
++        *d++ = *s++;
++    return dst;
++  }
++
++ 
++  struct proc *p = myproc();
++  if (p == 0) {
++   +    return dst;
++  }
++  char buf[128];
++  uint64 off = 0;
++  while (off < n) {
++    uint64 cnt = n - off;
++    if (cnt > sizeof(buf)) cnt = sizeof(buf);
++
++   
++    if ((uint64)src + off >= MAXVA) {
++      
++      char *ksrc = (char *)((char*)src + off);
++      for (uint64 i = 0; i < cnt; i++) buf[i] = ksrc[i];
++    } else {
++      if (copyin(p->pagetable, buf, (uint64)src + off, cnt) < 0)
++        return dst;
++    }
++
++ 
++    if ((uint64)dst + off >= MAXVA) {
++    
++      char *kd = (char *)((char*)dst + off);
++      for (uint64 i = 0; i < cnt; i++) kd[i] = buf[i];
++    } else {
++      if (copyout(p->pagetable, (uint64)dst + off, buf, cnt) < 0)
++        return dst; // invalid user dst
++    }
++
++    off += cnt;
++  }
++  return dst;
+ }
+*** End Patch

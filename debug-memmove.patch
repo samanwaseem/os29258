@@ -1,0 +1,19 @@
+diff --git a/kernel/string.c b/kernel/string.c
+index 1c2d3ab..9b8a4ef 100644
+--- a/kernel/string.c
++++ b/kernel/string.c
+@@
+ void*
+ memmove(void *dst, const void *src, uint n)
+ {
++  // Diagnostic: if either pointer is a user virtual address (< MAXVA),
++  // print caller info so we can find who passed a user pointer into memmove.
++  if ((uint64)dst < MAXVA || (uint64)src < MAXVA) {
++    void *caller = __builtin_return_address(0);
++    cprintf("DEBUG memmove: dst=%p src=%p n=%u caller=%p\n", dst, src, n, caller);
++    if (myproc()) {
++      cprintf("DEBUG memmove: pid=%d name=%s\n", myproc()->pid, myproc()->name);
++    } else {
++      cprintf("DEBUG memmove: pid=<none>\n");
++    }
++  }

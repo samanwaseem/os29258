@@ -62,10 +62,24 @@
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
+<<<<<<< Updated upstream
 #ifdef LAB_PGTBL
 #define USYSCALL (TRAPFRAME - PGSIZE)
 
 struct usyscall {
   int pid;  // Process ID
+=======
+
+// in kernel/memlayout.h
+
+// User-space virtual address for the usyscall page
+#define USYSCALL (TRAPFRAME - PGSIZE) 
+// (or perhaps 0x40000000, depending on your version)
+
+#ifndef __ASSEMBLER__
+// Structure for the data shared via the usyscall page
+struct usyscall {
+  int pid;
+>>>>>>> Stashed changes
 };
 #endif

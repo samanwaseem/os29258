@@ -6,6 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
+
+int mappages(pagetable_t, uint64, uint64, uint64, int);
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -132,6 +135,15 @@ found:
     return 0;
   }
 
+if((p->usyscall_page = (char *)kalloc()) == 0){
+  freeproc(p);
+  release(&p->lock);
+  return 0;
+}
+
+// Initialize the page content to zero
+memset(p->usyscall_page, 0, PGSIZE);
+
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -139,6 +151,16 @@ found:
     release(&p->lock);
     return 0;
   }
+ 
+  if(mappages(p->pagetable, USYSCALL, PGSIZE, (uint64)p->usyscall_page, PTE_R | PTE_U | PTE_V) != 0){
+  freeproc(p); 
+  release(&p->lock);
+  return 0;
+  }
+  
+   struct usyscall *usys = (struct usyscall *)p->usyscall_page;
+   usys->pid = p->pid;
+
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -212,6 +234,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  uvmunmap(pagetable, USYSCALL, 1, 0);
   uvmfree(pagetable, sz);
 }
 
@@ -288,6 +311,9 @@ kfork(void)
   safestrcpy(np->name, p->name, sizeof(p->name));
 
   pid = np->pid;
+   
+  struct usyscall *usys = (struct usyscall *)np->usyscall_page;
+  usys->pid = np->pid;
 
   release(&np->lock);
 

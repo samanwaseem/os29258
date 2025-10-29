@@ -166,6 +166,14 @@ $U/_forktest: $U/forktest.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
+$U/pgtbltest.o: $U/pgtbltest.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$U/_pgtbltest: $U/pgtbltest.o $(ULIB) $U/user.ld
+	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
+	$(OBJDUMP) -S $@ > $U/pgtbltest.asm
+	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $U/pgtbltest.sym
+
 mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
 	gcc $(XCFLAGS) -Werror -Wall -I. -o mkfs/mkfs mkfs/mkfs.c
 
@@ -179,6 +187,7 @@ UPROGS=\
 	$U/_cat\
 	$U/_echo\
 	$U/_forktest\
+        $U/_pgtbltest\
 	$U/_grep\
 	$U/_init\
 	$U/_kill\
@@ -250,11 +259,6 @@ ph: notxv6/ph.c
 
 barrier: notxv6/barrier.c
 	gcc -o barrier -g -O2 $(XCFLAGS) notxv6/barrier.c -pthread
-endif
-
-ifeq ($(LAB),pgtbl)
-UPROGS += \
-	$U/_pgtbltest
 endif
 
 ifeq ($(LAB),lock)

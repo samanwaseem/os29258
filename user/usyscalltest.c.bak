@@ -1,0 +1,26 @@
+// user/usyscalltest.c
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
+#include "user/usyscall.h"
+
+
+int
+main(int argc, char *argv[])
+{
+  struct usyscall *u = (struct usyscall *) USYSCALL;
+  int pid_from_map = u->pid;
+  int pid_from_sys = getpid();
+
+  printf("usyscall pid via mapping = %d\n", pid_from_map);
+  printf("syscall getpid = %d\n", pid_from_sys);
+
+  if(pid_from_map == pid_from_sys){
+    printf("OK: pid matches\n");
+    exit(0);
+  } else {
+    printf("ERR: pid mismatch\n");
+    exit(1);
+  }
+}
+
