@@ -170,7 +170,7 @@ $U/pgtbltest.o: $U/pgtbltest.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $U/_pgtbltest: $U/pgtbltest.o $(ULIB) $U/user.ld
-	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
+	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $< $(ULIB)
 	$(OBJDUMP) -S $@ > $U/pgtbltest.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $U/pgtbltest.sym
 
