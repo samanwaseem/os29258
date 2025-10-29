@@ -62,24 +62,26 @@
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
-<<<<<<< Updated upstream
+
 #ifdef LAB_PGTBL
+// User-space virtual address for the usyscall page (one page below TRAPFRAME).
 #define USYSCALL (TRAPFRAME - PGSIZE)
+#endif
 
-struct usyscall {
-  int pid;  // Process ID
-=======
-
-// in kernel/memlayout.h
-
-// User-space virtual address for the usyscall page
-#define USYSCALL (TRAPFRAME - PGSIZE) 
-// (or perhaps 0x40000000, depending on your version)
+// map kernel stacks beneath the trampoline,
+// each surrounded by invalid guard pages.
+#define KSTACK(p) (TRAMPOLINE - (p)*2*PGSIZE - 3*PGSIZE)
 
 #ifndef __ASSEMBLER__
+
+// The address is the kernel's stack top at its per-cpu entry.
+extern char trampoline[]; // entry.S
+
+#ifdef LAB_PGTBL
 // Structure for the data shared via the usyscall page
 struct usyscall {
-  int pid;
->>>>>>> Stashed changes
+  int pid;  // Process ID
 };
+#endif
+
 #endif
