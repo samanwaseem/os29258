@@ -1,0 +1,21 @@
+
+ 2. Is there a way to eliminate the special TRAPFRAME page mapping in every user address
+ space?
+
+ For example, could uservec be modified to simply push the 32 user registers onto
+ the kernel stack, or store them in the proc structure?
+
+Ans: Theoretically yes but it would need other changes alongside. 
+We cannot store into kernel virtual addresses until satp is switched. 
+We need a place to stash our registers to switch satp.
+ According to Chapter 4, trapframe must be user mapped because satp is still the user page table when uservec begins.
+"Because satp still refers to the user page table, uservec needs the trapframe to be mapped in the user address space. 
+xv6 maps each process’s trapframe at virtual address TRAPFRAME (0x3fffffe000) in that process’s user page table; one page below TRAMPOLINE.”
+In conclusion, no uservec cannot simply be modified to do so without additional changes.
+
+ 3. Could xv6 be modified to eliminate the special TRAMPOLINE page mapping?
+
+And: Yes but the limitations are similar. We would need other changes as well. 
+Also, stvec must point to an address that is mapped in the user page table when the trap starts. 
+“The need for trampoline pages could be eliminated if kernel memory were mapped into every process’s user page table (with PTE_U clear)"
+but the chapter also states that xv6 avoids this to reduce the complexity and chances of errors. 
