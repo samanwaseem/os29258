@@ -140,11 +140,45 @@ walkaddr(pagetable_t pagetable, uint64 va)
   return pa;
 }
 
+void
+vmprint_helper(pagetable_t pagetable, int depth, uint64 va_start)
+{
+
+  uint64 step_size = 1ULL << (9 * (2 - depth) + 12);
+  
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    
+    // Check if the PTE is valid (V bit is set)
+    if(pte & PTE_V){
+      uint64 va = va_start + (uint64)i * step_size;
+      
+      // Calculate the physical address from the PTE
+      uint64 pa = PTE2PA(pte);
+      
+      // Print indentation
+      for(int j = 0; j < depth; j++)
+        printf(" ..");
+      
+      // Print the PTE line: VA, PTE bits, PA
+      printf("%p: pte %p pa %p\n", (void *)va, (void *)pte, (void *)pa);
+
+      // Check if this PTE points to the next level of the page table
+      // (R, W, X bits are NOT set)
+      if((pte & (PTE_R|PTE_W|PTE_X)) == 0){
+        // This is a pointer to the next page table page (Level depth + 1)
+        pagetable_t child = (pagetable_t)pa;
+        vmprint_helper(child, depth + 1, va);
+      }
+    }
+  }
+}
 
 #if defined(LAB_PGTBL) || defined(SOL_MMAP) || defined(SOL_COW)
 void
 vmprint(pagetable_t pagetable) {
-  // your code here
+  printf("page table %p\n", pagetable);
+  vmprint_helper(pagetable, 1, 0);
 }
 #endif
 

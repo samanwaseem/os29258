@@ -38,7 +38,7 @@ int recv(uint16, uint32*, uint16*, char *, uint32);
 #ifdef LAB_PGTBL
 int ugetpid(void);
 uint64 pgpte(void*);
-void kpgtbl(void);
+int kpgtbl(void);
 #endif
 
 // ulib.c
