@@ -81,8 +81,27 @@ usertrap(void)
     kexit(-1);
 
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2)
-    yield();
+  if(which_dev == 2){
+  // If an alarm is set, check and potentially trigger the handler
+  if(p->alarm_interval > 0){
+    p->alarm_ticks_remaining--;
+    
+    // Check if alarm expired AND is not already running (for test2)
+    if(p->alarm_ticks_remaining <= 0 && p->alarm_is_running == 0){
+
+      *(p->saved_tf) = *(p->trapframe);
+
+      p->alarm_ticks_remaining = p->alarm_interval;
+      
+      p->alarm_is_running = 1; 
+
+      // The process will resume at this address when returning to user space.
+      p->trapframe->epc = p->alarm_handler;
+     }
+   }
+  // The original action for a timer interrupt
+  yield();
+  }
 
   prepare_return();
 
