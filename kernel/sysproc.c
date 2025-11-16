@@ -68,7 +68,10 @@ sys_pause(void)
   int n;
   uint ticks0;
 
+  backtrace();
+
   argint(0, &n);
+
   if(n < 0)
     n = 0;
   acquire(&tickslock);
@@ -104,4 +107,36 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64
+sys_sigalarm(void)
+{
+  int interval;
+  uint64 handler; // User function pointer
+  
+  // Call argint and argaddr directly. 
+  // We assume success based on the error message.
+  argint(0, &interval); 
+  argaddr(1, &handler); 
+
+  struct proc *p = myproc();
+  
+  // Store the new alarm configuration
+  p->alarm_interval = interval;
+  p->alarm_handler = handler;
+  p->alarm_ticks_remaining = interval; // Initialize the counter
+  
+  return 0;
+}
+
+//sigreturn() - required by the user handler to resume
+uint64
+sys_sigreturn(void)
+{
+  struct proc *p = myproc();
+  *(p->trapframe) = *(p->saved_tf);
+  p->alarm_is_running = 0;
+  
+  return p->trapframe->a0;
 }

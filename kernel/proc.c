@@ -140,6 +140,17 @@ found:
     return 0;
   }
 
+  if((p->saved_tf = (struct trapframe *)kalloc()) == 0){ // <-- ADD THIS BLOCK
+  freeproc(p);
+  release(&p->lock);
+  return 0;
+  }
+
+  p->alarm_interval = 0;
+  p->alarm_handler = 0;
+  p->alarm_ticks_remaining = 0;
+  p->alarm_is_running = 0;
+
   // Set up new context to start executing at forkret,
   // which returns to user space.
   memset(&p->context, 0, sizeof(p->context));
@@ -158,6 +169,11 @@ freeproc(struct proc *p)
   if(p->trapframe)
     kfree((void*)p->trapframe);
   p->trapframe = 0;
+
+  if(p->saved_tf)
+    kfree((void*)p->saved_tf);
+  p->saved_tf = 0;
+
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
   p->pagetable = 0;
