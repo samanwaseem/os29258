@@ -1,0 +1,52 @@
+
+1. Which registers contain arguments to functions? For example, which register holds 13 in main's call to printf?
+
+Registers a0-a7
+13 would be in a1 because of main's call to printf
+
+2. Where is the call to function f in the assembly code for main? Where is the call to g? (Hint: the compiler may inline functions.)
+
+grep -n -E 'jal|jalr|<f>|<g>|f:' user/call.asm || true
+7:0000000000000000 <g>:
+24:000000000000000e <f>:
+49:  30:        6c6000ef                jal     6f6 <printf>
+52:  36:        298000ef                jal     2ce <exit>
+68:  42:        fdbff0ef                jal     1c <main>
+70:  46:        288000ef                jal     2ce <exit>
+251: 134:       1b2000ef                jal     2e6 <read>
+301: 180:       18e000ef                jal     30e <open>
+309: 18e:       198000ef                jal     326 <fstat>
+313: 196:       160000ef                jal     2f6 <close>
+478: 28e:       f67ff0ef                jal     1f4 <memmove>
+...
+There is no explicit jal instruction to f. 
+The call to g is a jal instruction to label <g> in main.
+
+3.  At what address is the function printf located?
+
+user/call.asm
+with the label <printf>
+
+4. What value is in the register ra just after the jalr to printf in main?
+
+ra is the link register. jalr saved the address of the next instruction into it so it contains the insturction immediately following the call to printf.
+
+
+
+5. Run the following code.
+
+	unsigned int i = 0x00646c72;
+	printf("H%x Wo%s", 57616, (char *) &i);
+      
+What is the output? Here's an ASCII table that maps bytes to characters.
+The output depends on that fact that the RISC-V is little-endian. If the RISC-V were instead big-endian what would you set i to in order to yield the same output? Would you need to change 57616 to a different value?
+
+Output: HE1D0 World
+No, you would not need to change 57616 because the value of the integer passed is unaffected.
+
+6. In the following code, what is going to be printed after 'y='? (note: the answer is not a specific value.) Why does this happen?
+
+	printf("x=%d y=%d", 3);
+
+A garbage value is printed after y= because printf relies on the format of the string to determine how many arguments to read. 
+The output would be unpredictable.
