@@ -68,6 +68,14 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
+
+  } else if(r_scause() == 15 && (r_sstatus() & SSTATUS_SPP) == 0){
+    if(cow_fork_handler() < 0){
+        // If handler fails, the address was invalid or memory is exhausted.
+        printf("usertrap: CoW fault failed or invalid address pid=%d\n", p->pid);
+        setkilled(p);
+    }
+
   } else if((r_scause() == 15 || r_scause() == 13) &&
             vmfault(p->pagetable, r_stval(), (r_scause() == 13)? 1 : 0) != 0) {
     // page fault on lazily-allocated page

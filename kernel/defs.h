@@ -23,6 +23,7 @@ void            brelse(struct buf*);
 void            bwrite(struct buf*);
 void            bpin(struct buf*);
 void            bunpin(struct buf*);
+void backtrace(void);
 
 // console.c
 void            consoleinit(void);
@@ -66,6 +67,8 @@ void            ireclaim(int);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
+void            krcincref(uint64);
+int             krcdecref(uint64);
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -158,6 +161,7 @@ void            trapinit(void);
 void            trapinithart(void);
 extern struct spinlock tickslock;
 void            prepare_return(void);
+int cow_fork_handler(void);
 
 // uart.c
 void            uartinit(void);
@@ -166,7 +170,9 @@ void            uartwrite(char [], int);
 void            uartputc_sync(int);
 int             uartgetc(void);
 
+
 // vm.c
+int             uvmshare(pagetable_t, pagetable_t, uint64);
 void            kvminit(void);
 void            kvminithart(void);
 void            kvmmap(pagetable_t, uint64, uint64, uint64, int);
