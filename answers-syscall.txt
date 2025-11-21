@@ -1,0 +1,6 @@
+1. The ecall instruction generates a trap taht is handled>2. a7 is a register that holds the system call number.
+3. Supervisor Previous Privilege bit in sstatus
+4. lw a0, 0(zero)
+a0 corresponds to num
+5. Kernel crashes because address 0 is not mapped in kern>6. Process name is init with PID 1.
+6. Supervisor Privilege

@@ -1,0 +1,93 @@
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{0}: checkout: moving from main to PS2
+[33m64f48a9[m[33m ([m[1;32mmain[m[33m)[m HEAD@{1}: commit: Finished syscall lab implementation
+[33ma529c0a[m[33m ([m[1;31morigin/main[m[33m, [m[1;32msyscallcount[m[33m)[m HEAD@{2}: reset: moving to origin/main
+[33m03a6a76[m HEAD@{3}: checkout: moving from main to main
+[33m03a6a76[m HEAD@{4}: reset: moving to HEAD
+[33m03a6a76[m HEAD@{5}: checkout: moving from ps4 to main
+[33m0bfae9d[m[33m ([m[1;31morigin/traps[m[33m, [m[1;32mps4[m[33m)[m HEAD@{6}: checkout: moving from ps4 to ps4
+[33m0bfae9d[m[33m ([m[1;31morigin/traps[m[33m, [m[1;32mps4[m[33m)[m HEAD@{7}: Branch: renamed refs/heads/traps to refs/heads/ps4
+[33m0bfae9d[m[33m ([m[1;31morigin/traps[m[33m, [m[1;32mps4[m[33m)[m HEAD@{9}: commit: final ps4
+[33m2f3404e[m HEAD@{10}: checkout: moving from traps to traps
+[33m2f3404e[m HEAD@{11}: reset: moving to HEAD
+[33m2f3404e[m HEAD@{12}: checkout: moving from pgtbl to traps
+[33m4a040fb[m[33m ([m[1;31morigin/pgtbl[m[33m, [m[1;32mps3[m[33m, [m[1;32mpgtbl[m[33m)[m HEAD@{13}: checkout: moving from ps3 to pgtbl
+[33m4a040fb[m[33m ([m[1;31morigin/pgtbl[m[33m, [m[1;32mps3[m[33m, [m[1;32mpgtbl[m[33m)[m HEAD@{14}: checkout: moving from pgtbl to ps3
+[33m4a040fb[m[33m ([m[1;31morigin/pgtbl[m[33m, [m[1;32mps3[m[33m, [m[1;32mpgtbl[m[33m)[m HEAD@{15}: commit: pagetable update
+[33m8f6a56e[m HEAD@{16}: commit: page tables update
+[33m25572ca[m HEAD@{17}: checkout: moving from traps to pgtbl
+[33m2f3404e[m HEAD@{18}: commit: traps changes
+[33mcc784f9[m HEAD@{19}: checkout: moving from main to traps
+[33m03a6a76[m HEAD@{20}: checkout: moving from traps to main
+[33mcc784f9[m HEAD@{21}: checkout: moving from traps to traps
+[33mcc784f9[m HEAD@{22}: commit: Lab: Implemented Backtrace and Alarm system calls
+[33m4270ccc[m[33m ([m[1;31mmit/traps[m[33m)[m HEAD@{23}: checkout: moving from assignment2 to traps
+[33mc843fba[m[33m ([m[1;31morigin/assignment2[m[33m, [m[1;32massignment2[m[33m)[m HEAD@{24}: commit: assignment 2 solution
+[33m4270ccc[m[33m ([m[1;31mmit/traps[m[33m)[m HEAD@{25}: checkout: moving from traps to assignment2
+[33m4270ccc[m[33m ([m[1;31mmit/traps[m[33m)[m HEAD@{26}: checkout: moving from pingpong_test to traps
+[33m755f1bc[m HEAD@{27}: Branch: renamed refs/heads/ps4 to refs/heads/pingpong_test
+[33m755f1bc[m HEAD@{29}: checkout: moving from pingpong_task to ps4
+[33m03a6a76[m HEAD@{30}: checkout: moving from ps4 to pingpong_task
+[33m755f1bc[m HEAD@{31}: checkout: moving from ps1 to ps4
+[33mb4fe8c4[m HEAD@{32}: checkout: moving from ps4 to ps1
+[33m755f1bc[m HEAD@{33}: checkout: moving from ps1 to ps4
+[33mb4fe8c4[m HEAD@{34}: Branch: renamed refs/heads/newsyscall to refs/heads/ps1
+[33mb4fe8c4[m HEAD@{36}: commit: syscallcounter implementation
+[33ma529c0a[m[33m ([m[1;31morigin/main[m[33m, [m[1;32msyscallcount[m[33m)[m HEAD@{37}: checkout: moving from pingpong to newsyscall
+[33m755f1bc[m HEAD@{38}: commit: pingpong implementation
+[33m03a6a76[m HEAD@{39}: checkout: moving from pingpong to pingpong
+[33m03a6a76[m HEAD@{40}: checkout: moving from traps to pingpong
+[33m4270ccc[m[33m ([m[1;31mmit/traps[m[33m)[m HEAD@{41}: checkout: moving from traps to traps
+[33m4270ccc[m[33m ([m[1;31mmit/traps[m[33m)[m HEAD@{42}: checkout: moving from newsyscall to traps
+[33ma529c0a[m[33m ([m[1;31morigin/main[m[33m, [m[1;32msyscallcount[m[33m)[m HEAD@{43}: reset: moving to HEAD
+[33ma529c0a[m[33m ([m[1;31morigin/main[m[33m, [m[1;32msyscallcount[m[33m)[m HEAD@{44}: checkout: moving from syscallcount to newsyscall
+[33ma529c0a[m[33m ([m[1;31morigin/main[m[33m, [m[1;32msyscallcount[m[33m)[m HEAD@{45}: reset: moving to origin/main
+[33m03a6a76[m HEAD@{46}: checkout: moving from pingpong to syscallcount
+[33m03a6a76[m HEAD@{47}: checkout: moving from main to pingpong
+[33m03a6a76[m HEAD@{48}: checkout: moving from main to main
+[33m03a6a76[m HEAD@{49}: checkout: moving from feature/pingpong to main
+[33m2d051a7[m[33m ([m[1;32mps2[m[33m, [m[1;32mfeature/pingpong[m[33m)[m HEAD@{50}: checkout: moving from ps2 to feature/pingpong
+[33m2d051a7[m[33m ([m[1;32mps2[m[33m, [m[1;32mfeature/pingpong[m[33m)[m HEAD@{51}: checkout: moving from pgtbl to ps2
+[33m25572ca[m HEAD@{52}: commit: Final cleanup of Makefile and build rules for pgtbltest
+[33m5c59f60[m HEAD@{53}: commit: Resolved final conflicts in memlayout.h
+[33md9cff4d[m HEAD@{54}: commit: pgtbl lab: resolved merge conflicts.
+[33md389cf6[m HEAD@{55}: commit: pgtbl lab: fixed freewalk panic and resolved build conflicts.
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{56}: checkout: moving from pgtbl to pgtbl
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{57}: checkout: moving from main to pgtbl
+[33m03a6a76[m HEAD@{58}: reset: moving to HEAD
+[33m03a6a76[m HEAD@{59}: checkout: moving from main to main
+[33m03a6a76[m HEAD@{60}: checkout: moving from ps3 to main
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{61}: reset: moving to HEAD
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{62}: reset: moving to origin/pgtbl
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{63}: checkout: moving from ps3 to ps3
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{64}: checkout: moving from pgtbl to ps3
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{65}: checkout: moving from pgtbl to pgtbl
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{66}: checkout: moving from ps3 to pgtbl
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{67}: checkout: moving from pgtbl to ps3
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{68}: checkout: moving from pgtbl to pgtbl
+[33m15f200e[m[33m ([m[1;32mps3_pre_usyscall[m[33m)[m HEAD@{69}: checkout: moving from ps2 to pgtbl
+[33m2d051a7[m[33m ([m[1;32mps2[m[33m, [m[1;32mfeature/pingpong[m[33m)[m HEAD@{70}: commit: any unsaved changes befroe ps3
+[33m5fb575b[m HEAD@{71}: commit: attack.c update
+[33m1adbfff[m HEAD@{72}: commit: location issue
+[33m3529ce5[m HEAD@{73}: pull origin ps2 --no-rebase: Merge made by the 'ort' strategy.
+[33m3adc55f[m HEAD@{74}: commit: attack.c update
+[33m57187c3[m HEAD@{75}: checkout: moving from ps2 to ps2
+[33m57187c3[m HEAD@{76}: checkout: moving from ps2 to ps2
+[33m57187c3[m HEAD@{77}: commit: ps2 debugged
+[33m865294e[m HEAD@{78}: commit: ps2 initial
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{79}: checkout: moving from ps2 to ps2
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{80}: checkout: moving from syscall to ps2
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{81}: checkout: moving from syscall to syscall
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{82}: checkout: moving from syscall to syscall
+[33m0e53502[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPS2[m[33m, [m[1;31morigin/syscall[m[33m, [m[1;31morigin/PS2[m[33m, [m[1;31mmit/syscall[m[33m)[m HEAD@{83}: checkout: moving from ps2 to syscall
+[33m444017e[m[33m ([m[1;32mutil[m[33m)[m HEAD@{84}: checkout: moving from util to ps2
+[33m444017e[m[33m ([m[1;32mutil[m[33m)[m HEAD@{85}: checkout: moving from improved_ps1_optional_challenges to util
+[33m193ec34[m[33m ([m[1;32mimproved_ps1_optional_challenges[m[33m)[m HEAD@{86}: merge util: Merge made by the 'ort' strategy.
+[33ma83dd62[m HEAD@{87}: checkout: moving from util to improved_ps1_optional_challenges
+[33m444017e[m[33m ([m[1;32mutil[m[33m)[m HEAD@{88}: commit: update
+[33m03a6a76[m HEAD@{89}: checkout: moving from util to util
+[33m03a6a76[m HEAD@{90}: reset: moving to HEAD
+[33m03a6a76[m HEAD@{91}: checkout: moving from main to util
+[33m03a6a76[m HEAD@{92}: checkout: moving from util to main
+[33m03a6a76[m HEAD@{93}: commit: fixed + optional
+[33m6e8364e[m HEAD@{94}: commit: Add missing user code files
+[33mdb9a9d8[m[33m ([m[1;31morigin/util[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;31mmit/util[m[33m)[m HEAD@{95}: clone: from git://g.csail.mit.edu/xv6-labs-2025

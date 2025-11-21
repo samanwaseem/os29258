@@ -105,3 +105,24 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_interpose(void)
+{
+  int mask;
+  char path[MAXPATH];
+  struct proc *p = myproc();
+
+  // Retrieve integer mask (arg 0) and string path (arg 1).
+  // We do not check return value here to avoid "void value not ignored" error.
+  argint(0, &mask);
+  argstr(1, path, MAXPATH);
+
+  // Store the values in the proc structure
+  p->interpose_mask = mask;
+  safestrcpy(p->interpose_path, path, MAXPATH);
+  
+  return 0;
+}
+
+

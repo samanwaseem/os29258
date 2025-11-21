@@ -101,6 +101,7 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+extern uint64 sys_interpose(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -126,6 +127,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_interpose]   sys_interpose,
 };
 
 void
@@ -133,15 +135,39 @@ syscall(void)
 {
   int num;
   struct proc *p = myproc();
-
   num = p->trapframe->a7;
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Use num to lookup the system call function for num, call it,
-    // and store its return value in p->trapframe->a0
+
+    if (p->interpose_mask & (1 << num)) {
+        int allowed = 0;
+        
+        // Path Exception Check: only for SYS_open (15) or SYS_exec (7)
+        if ((num == SYS_open || num == SYS_exec) && p->interpose_path[0] != '-') {
+            
+            char path_arg[MAXPATH];
+            
+            // argstr returns 0 on success in some versions, but we use the return value
+            // check here because argstr's return type is often int in the context of syscalls.
+            if (argstr(0, path_arg, MAXPATH) >= 0) {
+                
+                if (strncmp(path_arg, p->interpose_path, MAXPATH) == 0) {
+                    allowed = 1; // Path matches, allow the call.
+                }
+            }
+        }
+        
+        // If the call is masked AND not explicitly allowed by the path, reject
+        if (!allowed) {
+            p->trapframe->a0 = -1; 
+            return;
+        }
+    }
+    
+    // Execute the system call
     p->trapframe->a0 = syscalls[num]();
   } else {
-    printf("%d %s: unknown sys call %d\n",
-            p->pid, p->name, num);
+    printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
 }
